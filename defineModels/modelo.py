@@ -1,7 +1,6 @@
 from typing import Any
-from .models import Student, User,Admin,Loan,Book
-from django.utils import timezone
-from datetime import timedelta
+from .models import Student,Admin,Loan,Book
+ 
 
 # Acá va el MODELO, el que se encuentra en el diagrama, solo utiliza las clases de modelo para CONSULTAS
 
@@ -11,10 +10,11 @@ class Usuario():
         return Book.objects.filter(title__icontains=title)
 
 class Estudiante(Student):
-    def getPrestamo():
-        return 
+    def getPrestamo(loa_student):
+        student_loa = Student.objects.get(loans=loa_student)
+        return student_loa
     
-    #Por corregir
+    #Pendiente Revision
     def __init__(self,reg_est,first_est,last_est,e_mail_est):
      self.register = reg_est
      self.first_name = first_est
@@ -22,12 +22,12 @@ class Estudiante(Student):
      self.e_mail = e_mail_est
 
 class Administrador(Admin):
-    
-    # def __init__(self,reg_adm,first_adm,last_adm,e_mail_adm):
-    #  self.register = reg_adm
-    #  self.first_name = first_adm
-    #  self.last_name = last_adm
-    #  self.e_mail = e_mail_adm
+    #Pendiente Revision
+    def __init__(self,reg_adm,first_adm,last_adm,e_mail_adm):
+     self.register = reg_adm
+     self.first_name = first_adm
+     self.last_name = last_adm
+     self.e_mail = e_mail_adm
 
     def registrarEstudiante(nom_est,ape_est,e_ma_est,reg_est):
         est = Student.objects.create(first_name=nom_est,last_name=ape_est,e_mail=e_ma_est,register=reg_est)
@@ -52,7 +52,7 @@ class Administrador(Admin):
 
     def registrarLibro(reg_lib,ti_lib,aut_lib,cat_lib,edi_lib):
         lib = Book.objects.create(register=reg_lib,title=ti_lib,author=aut_lib,category=cat_lib,editorial=edi_lib)
-        lib.save
+        lib.save()
 
     def actualizarLibro(reg_lib,ti_lib=None,aut_lib=None):
         lib = Book.objects.get(register=reg_lib)
@@ -67,32 +67,45 @@ class Administrador(Admin):
     def eliminarLibro(reg_lib):
         Book.objects.filter(register=reg_lib).delete()
     
-    #corregir Pendiente
-    def estadoPrestamoEstudiante(reg_loan):
-       est_lib = Loan.objects.get(register=reg_loan)
-       return est_lib
+    def estadoPrestamoEstudiante(reg_student):
+        loan_student = Student.objects.select_related("loans").get(register=reg_student)
+    
+    def agregarPrestamoEstudiante(reg_student,reg_book,date_loan,dev_date_loan):
 
-    def agregarPrestamoEstudiante(loan_lib=timezone.now(),book_lib=None):
-        pres = Loan.objects.create(loan_date=loan_lib,book=book_lib)
+        #creamos objeto Prestamo
+        pres = Loan.objects.create(loan_date=date_loan,devolution_date=dev_date_loan,renew_tries=0,book=reg_book)
         pres.save()
-    #corregir Pendiente
 
+        #Buscamos el estudiante
+        estudiante = Student.objects.get(register=reg_student)
+
+        #Asignamos el prestamo al estudiante
+        #solo se puede usar .add() si en el modelo Student se ocupa ManyToManyField para el prestamo
+        estudiante.loans.add(pres)
+    
     def eliminarPrestamoEstudiante():
         Loan.objects.filter().delete
 
 class Prestamo(Loan):
 
-    def getLoan_date():
-        return Loan.loan_date
-    def getDevolution_date():
-        return Loan.devolution_date
-    def getBook():
-        return Loan.book
+    def getLoan_date(date_loan):
+        loan_date = Loan.objects.get(loan_date=loan_date)
+        return loan_date
+    
+    def getDevolution_date(dev_loan):
+        loan_dev = Loan.objects.get(devolution_date=dev_loan)
+        return loan_dev
+    
+    def getBook(book_loan):
+        loan_book = Loan.objects.get(book=book_loan)
+        return loan_book
+    
+    #Pendiente
     def renovarPrestamo():
         return
     
 class Libro(Book):
-    #Por corregir
+    #Pendiente Revision
     def __init__(self,reg_book,title_book,author_book,category_book,editorial_book):
         self.register = reg_book
         self.title = title_book
@@ -100,16 +113,25 @@ class Libro(Book):
         self.category = category_book
         self.editorial = editorial_book
 
-    def getRegister():
-        return Book.register
-    def getTitle():
-        return Book.title
-    def getAthor():
-        return Book.author
-    def getCategory():
-        return Book.category
-    def getEditorial():
-        return Book.editorial
+    def getRegister(reg_book):
+        book_reg = Book.objects.get(register=reg_book)
+        return book_reg
+    
+    def getTitle(titl_book):
+        book_titl= Book.objects.get(title=titl_book)
+        return book_titl
+    
+    def getAthor(aut_book):
+        book_aut = Book.objects.get(author=aut_book)
+        return book_aut
+    
+    def getCategory(cate_book):
+        book_cate = Book.objects.get(category=cate_book)
+        return book_cate
+    
+    def getEditorial(edi_book):
+        book_edi = Book.objects.get(editorial=edi_book)
+        return book_edi
     
     def setRegister(re):
         Book.register = re

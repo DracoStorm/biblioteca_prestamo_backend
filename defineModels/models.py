@@ -28,6 +28,9 @@ class User(models.Model):
     last_name = models.CharField(max_length=20)
     e_mail = models.EmailField(default="", max_length=60)
 
+    class Meta:
+        abstract = True
+
 
 class Student(User):
     register = models.IntegerField(unique=True)
