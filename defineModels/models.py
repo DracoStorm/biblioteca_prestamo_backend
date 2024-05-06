@@ -15,7 +15,7 @@ class Book(models.Model):
 
 
 class Loan(models.Model):
-    # matricula = models.IntegerField(unique=True)
+    register = models.IntegerField(default=0,unique=True)
     loan_date = models.DateField(auto_now_add=True)
     devolution_date = models.DateField()
     renew_tries = models.IntegerField(
@@ -33,3 +33,6 @@ class Student(User):
     register = models.IntegerField(unique=True)
     loans = models.ForeignKey(
         Loan, on_delete=models.SET_NULL, null=True, blank=True, default="")
+
+class Admin(User):
+    register = models.IntegerField(unique=True)
