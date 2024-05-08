@@ -11,7 +11,7 @@ class Usuario():
         return Book.objects.filter(title__icontains=title)
 
 
-class Estudiante():
+class Estudiante(Usuario):
     def getPrestamo(self, r_est: int):
         return Student.objects.get(register=r_est).loans
 
@@ -24,7 +24,7 @@ class Estudiante():
         return pres
 
 
-class Administrador(Admin):
+class Administrador(Usuario):
 
     def registrarEstudiante(self, reg_est: int, nombre: str, apellido: str, correo_e: str):
         est = Student.objects.create(
@@ -83,11 +83,12 @@ class Administrador(Admin):
 
         # creamos objeto Prestamo
         pres = Loan.objects.create(
-            loan_date=date_loan, devolution_date=timezone.now().date()+timedelta(weeks=2), book=libro)
+            devolution_date=timezone.now().date()+timedelta(weeks=2), book=libro)
         pres.save()
 
         estudiante = Student.objects.get(register=reg_student)
         sl = estudiante.loans
+
         if sl.loan_0 == None:
             sl.loan_0 = pres
         elif sl.loan_1 == None:
@@ -109,21 +110,38 @@ class Administrador(Admin):
         elif sl.loan_9 == None:
             sl.loan_9 = pres
 
-        return estudiante
+        sl.save()
+        return sl
 
-    def eliminarPrestamoEstudiante(reg_student: int, id_pres):
-        sl = Student.objects.get(id=reg_student).loans
-        campos = sl._meta.fields
-        for campo in campo:
-            campo_name = campo.name
-            campo_value = getattr(sl, campo_name)
-            if campo_value == id_pres:
-                campo_value = None
+    def eliminarPrestamoEstudiante(self, reg_student: int, id_pres):
+        sl = Student.objects.get(register=reg_student).loans
 
-        Loan.objects.filter().delete
+        if sl.loan_0.id == id_pres:
+            sl.loan_0 = None
+        elif sl.loan_1.id == id_pres:
+            sl.loan_1 = None
+        elif sl.loan_2.id == id_pres:
+            sl.loan_2 = None
+        elif sl.loan_3.id == id_pres:
+            sl.loan_3 = None
+        elif sl.loan_4.id == id_pres:
+            sl.loan_4 = None
+        elif sl.loan_5.id == id_pres:
+            sl.loan_5 = None
+        elif sl.loan_6.id == id_pres:
+            sl.loan_6 = None
+        elif sl.loan_7.id == id_pres:
+            sl.loan_7 = None
+        elif sl.loan_8.id == id_pres:
+            sl.loan_8 = None
+        elif sl.loan_9.id == id_pres:
+            sl.loan_9 = None
+
+        sl.save()
+        Loan.objects.filter(id=id_pres).delete()
 
 
-class Prestamo(Loan):
+class Prestamo():
 
     def getLoan_date(date_loan):
         loan_date = Loan.objects.get(loan_date=loan_date)
@@ -142,7 +160,7 @@ class Prestamo(Loan):
         return
 
 
-class Libro(Book):
+class Libro():
     # Pendiente Revision
     def __init__(self, reg_book, title_book, author_book, category_book, editorial_book):
         self.register = reg_book
