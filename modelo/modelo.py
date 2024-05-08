@@ -1,91 +1,125 @@
-from typing import Any
-from .models import Student, Admin, Loan, Book
+from datetime import date, timedelta
+from .models import Student, Admin, Loan, Book, StudentLoans
+from django.utils import timezone
 
 
 # Acá va el MODELO, el que se encuentra en el diagrama, solo utiliza las clases de modelo para CONSULTAS
 
 
 class Usuario():
-    def buscarLibro(title):
+    def buscarLibro(title: str):
         return Book.objects.filter(title__icontains=title)
 
 
 class Estudiante():
-    # Pendiente Revision
-    def __init__(self, reg_est):
-        s = Student.objects.get(reg_est)
-        if s is None:
-            raise Exception('No existe el estudiante')
+    def getPrestamo(self, r_est: int):
+        return Student.objects.get(register=r_est).loans
 
-    def getPrestamo(loa_student):
-        student_loa = Student.objects.get(loans=loa_student)
-        return student_loa
+    def renovarPrestamo(self, id_pres: int):
+        pres = Loan.objects.get(id=id_pres)
+        if pres.devolution_date <= timezone.now().date() or pres.renew_tries >= 2:
+            raise Exception('Demasiadas renovaciones')
+        pres.renew_tries += 1
+        pres.devolution_date += timedelta(weeks=2)
+        return pres
 
 
 class Administrador(Admin):
-    # Pendiente Revision
-    def __init__(self, reg_adm):
-        ...
 
-    def registrarEstudiante(nom_est, ape_est, e_ma_est, reg_est):
+    def registrarEstudiante(self, reg_est: int, nombre: str, apellido: str, correo_e: str):
         est = Student.objects.create(
-            first_name=nom_est, last_name=ape_est, e_mail=e_ma_est, register=reg_est)
+            register=reg_est, first_name=nombre, last_name=apellido, e_mail=correo_e, loans=StudentLoans.objects.create())
         est.save()
 
-    def actualizarEstudiante(reg_est, nom_est=None, ape_est=None, e_ma_est=None):
+    def actualizarEstudiante(self, reg_est: int, nom_est: str | None, ape_est: str | None, e_ma_est: str | None):
 
         est = Student.objects.get(register=reg_est)
 
-        # Actualiza los valores si se proporcionan
+        allNone: bool = True
         if nom_est is not None:
             est.first_name = nom_est
+            allNone = False
         if ape_est is not None:
             est.last_name = ape_est
+            allNone = False
         if e_ma_est is not None:
             est.e_mail = e_ma_est
-
+            allNone = False
+        if allNone:
+            raise Exception('All None values')
         est.save()
 
-    def eliminarEstudiante(reg_est):
+    def eliminarEstudiante(self, reg_est: int):
         Student.objects.filter(register=reg_est).delete()
 
-    def registrarLibro(reg_lib, ti_lib, aut_lib, cat_lib, edi_lib):
+    def registrarLibro(self, titulo: str, autor: str, editorial: str, categoria: str):
         lib = Book.objects.create(
-            register=reg_lib, title=ti_lib, author=aut_lib, category=cat_lib, editorial=edi_lib)
+            title=titulo, author=autor, editorial=editorial, category=categoria)
         lib.save()
 
-    def actualizarLibro(reg_lib, ti_lib=None, aut_lib=None):
-        lib = Book.objects.get(register=reg_lib)
-
-        if ti_lib is not None:
-            lib.title = ti_lib
-        if aut_lib is not None:
-            lib.author = aut_lib
-
+    def actualizarLibro(self, reg_lib: int, titulo: str | None, autor=str | None):
+        lib = Book.objects.get(id=reg_lib)
+        allNone: bool = True
+        if titulo is not None:
+            lib.title = titulo
+            allNone = False
+        if autor is not None:
+            lib.author = autor
+            allNone = False
+        if allNone:
+            raise Exception('All None values')
         lib.save()
 
-    def eliminarLibro(reg_lib):
-        Book.objects.filter(register=reg_lib).delete()
+    def eliminarLibro(self, reg_lib: int):
+        Book.objects.filter(id=reg_lib).delete()
 
-    def estadoPrestamoEstudiante(reg_student):
+    def estadoPrestamoEstudiante(self, reg_student: int):
         loan_student = Student.objects.select_related(
             "loans").get(register=reg_student)
 
-    def agregarPrestamoEstudiante(reg_student, reg_book, date_loan, dev_date_loan):
+    def agregarPrestamoEstudiante(self, reg_student: int, id_book: int, date_loan: str):
+
+        libro = Book.objects.get(id=id_book)
 
         # creamos objeto Prestamo
         pres = Loan.objects.create(
-            loan_date=date_loan, devolution_date=dev_date_loan, renew_tries=0, book=reg_book)
+            loan_date=date_loan, devolution_date=timezone.now().date()+timedelta(weeks=2), book=libro)
         pres.save()
 
-        # Buscamos el estudiante
         estudiante = Student.objects.get(register=reg_student)
+        sl = estudiante.loans
+        if sl.loan_0 == None:
+            sl.loan_0 = pres
+        elif sl.loan_1 == None:
+            sl.loan_1 = pres
+        elif sl.loan_2 == None:
+            sl.loan_2 = pres
+        elif sl.loan_3 == None:
+            sl.loan_3 = pres
+        elif sl.loan_4 == None:
+            sl.loan_4 = pres
+        elif sl.loan_5 == None:
+            sl.loan_5 = pres
+        elif sl.loan_6 == None:
+            sl.loan_6 = pres
+        elif sl.loan_7 == None:
+            sl.loan_7 = pres
+        elif sl.loan_8 == None:
+            sl.loan_8 = pres
+        elif sl.loan_9 == None:
+            sl.loan_9 = pres
 
-        # Asignamos el prestamo al estudiante
-        # solo se puede usar .add() si en el modelo Student se ocupa ManyToManyField para el prestamo
-        estudiante.loans.add(pres)
+        return estudiante
 
-    def eliminarPrestamoEstudiante():
+    def eliminarPrestamoEstudiante(reg_student: int, id_pres):
+        sl = Student.objects.get(id=reg_student).loans
+        campos = sl._meta.fields
+        for campo in campo:
+            campo_name = campo.name
+            campo_value = getattr(sl, campo_name)
+            if campo_value == id_pres:
+                campo_value = None
+
         Loan.objects.filter().delete
 
 
