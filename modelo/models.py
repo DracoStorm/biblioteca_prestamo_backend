@@ -1,18 +1,24 @@
+import secrets
+import token
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
-from .enums import Editorial, Category
 
 
 # Acá solo van las TABLAS, por eso estan en ingles para diferenciarlas
 
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+
+
+class Editorial(models.Model):
+    name = models.CharField(max_length=70)
+
+
 class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.CharField(max_length=50)
-    category = models.CharField(max_length=50, choices=[
-        (c.value, c.name) for c in Category])
-    editorial = models.CharField(max_length=50, choices=[
-                                 (e.value, e.name) for e in Editorial])
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
+    editorial = models.ForeignKey(Editorial, on_delete=models.DO_NOTHING)
 
 
 class Loan(models.Model):
@@ -60,8 +66,11 @@ class User(models.Model):
 class Student(User):
     loans = models.ForeignKey(
         StudentLoans, on_delete=models.CASCADE)
+    token = models.CharField(max_length=50, unique=True)
 
 
 class Admin(User):
     last_session = models.DateTimeField(
         auto_now_add=True)
+    token = models.CharField(max_length=50, unique=True,
+                             default=secrets.token_hex(25))
