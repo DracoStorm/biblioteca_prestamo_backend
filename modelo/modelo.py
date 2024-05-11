@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+import email
 from enum import auto
 import secrets
 from .models import Category, Student, Admin, Loan, Book, StudentLoans, Editorial
@@ -122,14 +123,18 @@ class Administrador(Usuario):
         except:
             raise Exception('Failed to create the object')
 
-    def buscarEstudiante(self, matricula: int | None = None, nombre: str | None = None, apellido: str | None = None):
+    def buscarEstudiante(self, matricula: int | None = None, nombre: str | None = None, apellido: str | None = None, e_mail: str | None = None):
         try:
+            if not matricula and not nombre and not apellido and not e_mail:
+                raise Exception('All None values')
             if matricula:
                 s = Student.objects.filter(register__icontains=matricula)
             if nombre:
                 s = Student.objects.filter(first_name__icontains=nombre)
             if apellido:
                 s = Student.objects.filter(last_name__icontains=apellido)
+            if e_mail:
+                s = Student.objects.filter(e_mail__icontains=e_mail)
         except Student.DoesNotExist:
             raise Exception('Student doesnt exist')
         return s
@@ -162,9 +167,9 @@ class Administrador(Usuario):
     def eliminarEstudiante(self, reg_est: int):
         Student.objects.filter(register=reg_est).delete()
 
-    def registrarLibro(self, titulo: str, autor: str, editorial: str, categoria: str):
+    def registrarLibro(self, titulo: str, autor: str, editorial: int, categoria: int):
         lib = Book.objects.create(
-            title=titulo, author=autor, editorial=editorial, category=categoria)
+            title=titulo, author=autor, editorial=Editorial.objects.get(id=editorial), category=Category.objects.get(id=categoria))
         lib.save()
         return lib
 
@@ -185,8 +190,7 @@ class Administrador(Usuario):
             allNone = False
         if allNone:
             raise Exception('All None values')
-        lib.save()
-        return lib
+        return lib.getBook()
 
     def eliminarLibro(self, id_lib: int):
         Book.objects.filter(id=id_lib).delete()
