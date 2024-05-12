@@ -54,8 +54,9 @@ class Sesion(APIView):
         apellido = request.headers.get('last-name')
         if id and nombre and apellido:
             token = CtrlSesion().crearSesion(int(id), nombre, apellido)
-        if token:
-            return Response(headers={'token': token})
+            print(apellido)
+            if token:
+                return Response(headers={'token': token})
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
