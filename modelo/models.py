@@ -72,5 +72,4 @@ class Student(User):
 class Admin(User):
     last_session = models.DateTimeField(
         auto_now_add=True)
-    token = models.CharField(max_length=50, unique=True,
-                             default=secrets.token_hex(25))
+    token = models.CharField(max_length=50, unique=True)
