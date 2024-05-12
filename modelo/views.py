@@ -50,12 +50,12 @@ class CtrlSesion():
 class Sesion(APIView):
     def post(self, request):
         id = request.headers.get('id')
-        nombre = request.headers.get('nombre')
-        apellido = request.headers.get('apellido')
+        nombre = request.headers.get('first-name')
+        apellido = request.headers.get('last-name')
         if id and nombre and apellido:
             token = CtrlSesion().crearSesion(int(id), nombre, apellido)
-            if token:
-                return Response(headers={'token': token})
+        if token:
+            return Response(headers={'token': token})
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
