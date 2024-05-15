@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-class CtrlSesion():
+class Sesion():
     def crearSesion(self, id: int, nombre: str, apellido: str):
         if id > 999999999 or id <= 99999999:
             return None
@@ -47,19 +47,19 @@ class CtrlSesion():
         return None
 
 
-class Sesion(APIView):
+class CtrlSesion(APIView):
     def post(self, request):
         id = request.headers.get('id')
         nombre = request.headers.get('first-name')
         apellido = request.headers.get('last-name')
         if id and nombre and apellido:
-            token = CtrlSesion().crearSesion(int(id), nombre, apellido)
+            token = Sesion().crearSesion(int(id), nombre, apellido)
             if token:
                 return Response(headers={'token': token})
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class EstudianteLibro(APIView):
+class CtrlEstudianteLibro(APIView):
     def post(self, request):
         admin = CtrlSesion().validarSesion(request, permision='estudiante')
         if not admin:
@@ -77,7 +77,7 @@ class EstudianteLibro(APIView):
         return Response(serial.data)
 
 
-class EstudiantePrestamo(APIView):
+class CtrlEstudiantePrestamo(APIView):
     def get(self, request):
         estu = CtrlSesion().validarSesion(request, permision='estudiante')
         if not estu:
@@ -102,7 +102,7 @@ class EstudiantePrestamo(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class AdminBook(APIView):
+class CtrlAdminBook(APIView):
     def post(self, request):
         admin = CtrlSesion().validarSesion(request, permision='administrador')
         if not admin:
@@ -166,7 +166,7 @@ class AdminBook(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class AdminStudent(APIView):
+class CtrlAdminStudent(APIView):
     def post(self, request):
         admin = CtrlSesion().validarSesion(request, permision='administrador')
         if not admin:
@@ -229,7 +229,7 @@ class AdminStudent(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class AdminPrestamo(APIView):
+class CtrlAdminPrestamo(APIView):
     def post(self, request):
         admin = CtrlSesion().validarSesion(request, permision='administrador')
         if not admin:
@@ -277,13 +277,13 @@ class AdminPrestamo(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class BookCategory(APIView):
+class CtrlBookCategory(APIView):
     def get(self, request):
         serial = CategorySerializer(Category.objects.all(), many=True)
         return Response(serial.data)
 
 
-class BookEditorial(APIView):
+class CtrlBookEditorial(APIView):
     def get(self, request):
         serial = EditorialSerializer(Editorial.objects.all(), many=True)
         return Response(serial.data)
