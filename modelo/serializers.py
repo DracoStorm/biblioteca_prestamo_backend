@@ -1,3 +1,4 @@
+from pkg_resources import require
 from rest_framework import serializers
 from .models import Category, Editorial, Student, Loan, Book, StudentLoans
 
@@ -32,31 +33,42 @@ class LoanSerializer(serializers.ModelSerializer):
 
 
 class StudentLoansSerializer(serializers.ModelSerializer):
-    loan_0 = LoanSerializer()
-    loan_1 = LoanSerializer()
-    loan_2 = LoanSerializer()
-    loan_3 = LoanSerializer()
-    loan_4 = LoanSerializer()
-    loan_5 = LoanSerializer()
-    loan_6 = LoanSerializer()
-    loan_7 = LoanSerializer()
-    loan_8 = LoanSerializer()
-    loan_9 = LoanSerializer()
+    loan_0 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
+    loan_1 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
+    loan_2 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
+    loan_3 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
+    loan_4 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
+    loan_5 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
+    loan_6 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
+    loan_7 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
+    loan_8 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
+    loan_9 = serializers.PrimaryKeyRelatedField(
+        queryset=Loan.objects.all(), required=False, allow_null=True)
 
     class Meta:
         model = StudentLoans
-        fields = ['id', 'loan_0', 'loan_1', 'loan_2', 'loan_3',
-                  'loan_4', 'loan_5', 'loan_6', 'loan_7', 'loan_8', 'loan_9']
 
     def to_representation(self, instance):
-        # Call the superclass's to_representation method
-        data = super().to_representation(instance)
-
-        # Filter out fields with null values
-        return {key: value for key, value in data.items() if value}
+        loans = []
+        for i in range(10):
+            loan_field_name = f'loan_{i}'
+            loan_instance = getattr(instance, loan_field_name)
+            if loan_instance:
+                loans.append(LoanSerializer(loan_instance).data)
+        # Return a dict with the list
+        return {'loans': loans}
 
 
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['register', 'first_name', 'last_name', 'e_mail', 'loans_id']
+        fields = ['register', 'first_name', 'last_name', 'e_mail']

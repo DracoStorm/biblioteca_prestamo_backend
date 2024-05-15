@@ -54,7 +54,6 @@ class Sesion(APIView):
         apellido = request.headers.get('last-name')
         if id and nombre and apellido:
             token = CtrlSesion().crearSesion(int(id), nombre, apellido)
-            print(apellido)
             if token:
                 return Response(headers={'token': token})
         return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -91,7 +90,8 @@ class EstudiantePrestamo(APIView):
         estu = CtrlSesion().validarSesion(request, permision='estudiante')
         if not estu:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        pres = request.data.get('prestamo')
+        # print(request.data)
+        pres: int = request.data.get('id_loan')
         if pres:
             try:
                 p = estu.renovarPrestamo(pres)
