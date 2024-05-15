@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-class Sesion():
+class CtrlSesion():
     def crearSesion(self, id: int, nombre: str, apellido: str):
         if id > 999999999 or id <= 99999999:
             return None
@@ -47,13 +47,13 @@ class Sesion():
         return None
 
 
-class CtrlSesion(APIView):
+class CtrlCrearSesion(APIView):
     def post(self, request):
         id = request.headers.get('id')
         nombre = request.headers.get('first-name')
         apellido = request.headers.get('last-name')
         if id and nombre and apellido:
-            token = Sesion().crearSesion(int(id), nombre, apellido)
+            token = CtrlSesion().crearSesion(int(id), nombre, apellido)
             if token:
                 return Response(headers={'token': token})
         return Response(status=status.HTTP_401_UNAUTHORIZED)
