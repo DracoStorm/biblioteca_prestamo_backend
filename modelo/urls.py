@@ -2,7 +2,7 @@ from django.urls import path
 from modelo import views
 
 urlpatterns = [
-    path('u/sesion/', views.CtrlSesion.as_view()),
+    path('u/sesion/', views.CtrlCrearSesion.as_view()),
     path('u/editorial/', views.CtrlBookEditorial.as_view()),
     path('u/category/', views.CtrlBookCategory.as_view()),
     path('e/loan/', views.CtrlEstudiantePrestamo.as_view()),
