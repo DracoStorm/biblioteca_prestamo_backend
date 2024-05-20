@@ -61,14 +61,15 @@ class CtrlCrearSesion(APIView):
 
 class CtrlEstudianteLibro(APIView):
     def post(self, request):
-        admin = CtrlSesion().validarSesion(request, permision='estudiante')
-        if not admin:
+        estu = CtrlSesion().validarSesion(request, permision='estudiante')
+        if not estu:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+        print(request.data.get('Categoría   '))
         try:
-            s = admin.buscarLibro(request.data.get('title'),
-                                  request.data.get('author'),
-                                  request.data.get('editorial'),
-                                  request.data.get('category'))
+            s = estu.buscarLibro(request.data.get('Título'),
+                                 request.data.get('Autor'),
+                                 request.data.get('Editorial'),
+                                 request.data.get('Categoría'))
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if not s:
@@ -108,10 +109,10 @@ class CtrlAdminBook(APIView):
         if not admin:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
-            s = admin.buscarLibro(request.data.get('title'),
-                                  request.data.get('author'),
-                                  request.data.get('editorial'),
-                                  request.data.get('category'))
+            s = admin.buscarLibro(request.data.get('Título'),
+                                  request.data.get('Autor'),
+                                  request.data.get('Editorial'),
+                                  request.data.get('Categoría'))
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if not s:
@@ -172,10 +173,10 @@ class CtrlAdminStudent(APIView):
         if not admin:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
-            s = admin.buscarEstudiante(request.data.get('register'),
-                                       request.data.get('first_name'),
-                                       request.data.get('last_name'),
-                                       request.data.get('e_mail'))
+            s = admin.buscarEstudiante(request.data.get('Matrícula'),
+                                       request.data.get('Nombre'),
+                                       request.data.get('Apellido'),
+                                       request.data.get('Correo Electrónico'))
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if not s:

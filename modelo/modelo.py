@@ -75,16 +75,18 @@ class Prestamo():
 
 
 class Usuario():
-    def buscarLibro(self, title: str | None = None, autor: str | None = None, editorial: int | None = None, categoria: int | None = None):
+    def buscarLibro(self, title: str | None = None, autor: str | None = None, editorial: str | None = None, categoria: str | None = None):
         try:
             if title:
                 b = Book.objects.filter(title__icontains=title)
             if autor:
                 b = Book.objects.filter(author__icontains=autor)
             if editorial:
-                b = Book.objects.filter(editorial=editorial)
+                b = Book.objects.filter(
+                    editorial__in=Editorial.objects.filter(name__icontains=editorial))
             if categoria:
-                b = Book.objects.filter(categoria=categoria)
+                b = Book.objects.filter(
+                    category__in=Category.objects.filter(name__icontains=categoria))
         except Book.DoesNotExist:
             raise Exception('Book doesnt exist')
         return b
