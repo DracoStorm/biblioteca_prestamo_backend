@@ -78,15 +78,15 @@ class Usuario():
     def buscarLibro(self, title: str | None = None, autor: str | None = None, editorial: str | None = None, categoria: str | None = None):
         try:
             if title:
-                b = Book.objects.filter(title__icontains=title)
+                b = Book.objects.filter(title__icontains=title)[:15]
             if autor:
-                b = Book.objects.filter(author__icontains=autor)
+                b = Book.objects.filter(author__icontains=autor)[:15]
             if editorial:
                 b = Book.objects.filter(
-                    editorial__in=Editorial.objects.filter(name__icontains=editorial))
+                    editorial__in=Editorial.objects.filter(name__icontains=editorial))[:15]
             if categoria:
                 b = Book.objects.filter(
-                    category__in=Category.objects.filter(name__icontains=categoria))
+                    category__in=Category.objects.filter(name__icontains=categoria))[:15]
         except Book.DoesNotExist:
             raise Exception('Book doesnt exist')
         return b
@@ -130,13 +130,13 @@ class Administrador(Usuario):
             if not matricula and not nombre and not apellido and not e_mail:
                 raise Exception('All None values')
             if matricula:
-                s = Student.objects.filter(register__icontains=matricula)
+                s = Student.objects.filter(register__icontains=matricula)[:15]
             if nombre:
-                s = Student.objects.filter(first_name__icontains=nombre)
+                s = Student.objects.filter(first_name__icontains=nombre)[:15]
             if apellido:
-                s = Student.objects.filter(last_name__icontains=apellido)
+                s = Student.objects.filter(last_name__icontains=apellido)[:15]
             if e_mail:
-                s = Student.objects.filter(e_mail__icontains=e_mail)
+                s = Student.objects.filter(e_mail__icontains=e_mail)[:15]
         except Student.DoesNotExist:
             raise Exception('Student doesnt exist')
         return s
