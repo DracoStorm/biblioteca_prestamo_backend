@@ -241,7 +241,7 @@ class Administrador(Usuario):
         sl.save()
         return sl
 
-    def eliminarPrestamoEstudiante(self, reg_student: int, id_pres):
+    def eliminarPrestamoEstudiante(self, reg_student: int, id_pres: int):
         sl = Student.objects.get(register=reg_student).loans
 
         if sl.loan_0.id == id_pres:

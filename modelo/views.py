@@ -268,10 +268,11 @@ class CtrlAdminPrestamo(APIView):
         admin = CtrlSesion().validarSesion(request, permision='administrador')
         if not admin:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+        print(request.data)
         try:
             admin.eliminarPrestamoEstudiante(
-                request.data.get('register'),
-                request.data.get('id_loan'))
+                int(request.data.get('register')),
+                int(request.data.get('id_loan')))
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
